@@ -36,7 +36,6 @@ int main (){
         for (int j = 0; j < m; j++) {
             cin >> g[i][j];
             if (g[i][j] == 'A') start = mkp(i,j);
-            if (g[i][j] == 'B') end = mkp(i,j); 
         }
     }
      
@@ -44,13 +43,15 @@ int main (){
     marked[start.first][start.second] = true;
     while (!queue.empty()) {
         current = queue.front(); 
-        if (current == end) break;
-
+        if (current.first == 0 || current.first == n-1 || current.second == 0 || current.second == m-1 ){
+            end = current;  
+            break;
+        }
         for (int i = 0; i < 4; i++) {
             aux = mkp(current.first + dx[i], current.second + dy[i]);
-            if (aux.first < 0 || aux.first >= n || aux.second < 0 || aux.second >= m) continue;
+            //if (aux.first < 0 || aux.first >= n || aux.second < 0 || aux.second >= m) continue;
             if (marked[aux.first][aux.second]) continue;
-            if(g[aux.first][aux.second] == '#') continue;
+            if(g[aux.first][aux.second] != '.') continue;
             marked[aux.first][aux.second] = true;
             actions[aux.first][aux.second] = i;
             queue.push(aux);
