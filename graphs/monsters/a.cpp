@@ -7,66 +7,93 @@
 
 #define mkp make_pair
 #define pii pair<int, int>
+#define MAX 10e6
+#define f first
+#define s second
+
 
 using namespace std;
 
-int main (){
-    int dx[] = {-1, 1, 0, 0};
-    int dy[] = { 0, 0,-1, 1};
-    char str[] = {'U', 'D', 'L', 'R' ,'-'};
 
-    char g[1000][1000];
-    bool marked[1000][1000]; 
+int dx[] = {-1, 1, 0, 0};
+int dy[] = { 0, 0,-1, 1};
+char str[] = {'U', 'D', 'L', 'R' ,'-'};
+int marked[1000][1000];
+char g[1000][1000];
+int dist[1000][1000];
+int n,m, auxDist;
+
+int main (){
+    
+
     int actions[1000][1000];
-    stack<char> p;
-    queue<pii> queue;
-    
-    
-    for (int i = 0; i < 1000; i++) 
-        for (int j = 0; j < 1000; j++)
+    for (int i = 0; i < 1000; i++){ 
+        for (int j = 0; j < 1000; j++){
             actions[i][j] = 4;
+            dist[i][j] = MAX;
+            marked[i][j] = -1;
+        }
+    }
     
-    
-    int n,m;
-    cin >> n >> m;
-    
-    pii start,end,current,aux;
+    stack<char> p;
+    queue<pii> mq, q;
+    pii start,end = make_pair(-1, -1),current,aux;
+    cin >> n >> m; 
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
             cin >> g[i][j];
             if (g[i][j] == 'A') start = mkp(i,j);
+            if (g[i][j] == 'M') {
+                mq.push(mkp(i,j)); 
+                dist[i][j] = 0;
+            }
         }
     }
-     
-    queue.push(start);
-    marked[start.first][start.second] = true;
-    while (!queue.empty()) {
-        current = queue.front(); 
-        if (current.first == 0 || current.first == n-1 || current.second == 0 || current.second == m-1 ){
-            end = current;  
+    
+    //monster search
+    while (!mq.empty()) {
+        current = mq.front(); mq.pop(); 
+        auxDist = dist[current.f][current.s] + 1;
+        for (int i = 0; i < 4; i++) {
+            aux = mkp(current.f + dx[i], current.s + dy[i]);
+            if (aux.f < 0 || aux.f >= n || aux.s < 0 || aux.s >= m) continue;
+            if (dist[aux.f][aux.s] <= auxDist) continue;
+            if (g[aux.f][aux.s] == '#') continue;
+            dist[aux.f][aux.s] = auxDist; 
+            mq.push(aux);
+        }
+    }
+           
+    q.push(start);
+    marked[start.f][start.s] = 0;
+    while (!q.empty()) {
+        current = q.front(); q.pop();
+        
+        if (current.f == 0 || current.s == 0 || current.first == n-1 || current.second == m-1) {
+            end = current;
             break;
         }
+
+        auxDist = marked[current.f][current.s] + 1;
         for (int i = 0; i < 4; i++) {
-            aux = mkp(current.first + dx[i], current.second + dy[i]);
-            //if (aux.first < 0 || aux.first >= n || aux.second < 0 || aux.second >= m) continue;
-            if (marked[aux.first][aux.second]) continue;
-            if(g[aux.first][aux.second] != '.') continue;
-            marked[aux.first][aux.second] = true;
-            actions[aux.first][aux.second] = i;
-            queue.push(aux);
+            aux = mkp(current.f + dx[i], current.s + dy[i]);
+            if (aux.f < 0 || aux.f >= n || aux.s < 0 || aux.s >= m) continue;
+            if (dist[aux.f][aux.s] <= auxDist || marked[aux.f][aux.s] != -1) continue;
+            if (g[aux.f][aux.s] == '#') continue;
+            actions[aux.f][aux.s] = i;
+            marked[aux.f][aux.s] = auxDist; 
+            q.push(aux);
         }
-        
-        queue.pop();
     }
-        
-    if (marked[end.first][end.second] == true){
+
+    if (end.f > -1){
         cout << "YES" << endl;
     
         while (end != start) { 
             int action = actions[end.first][end.second];  
             p.push(str[action]);
-            end = mkp(end.first - dx[action], end.second - dy[action]); 
+            end = mkp(end.f - dx[action], end.s - dy[action]); 
         }
         
         cout << p.size()<<endl;
@@ -79,14 +106,5 @@ int main (){
 
     else cout << "NO" <<endl;
 
-
-    /*
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < m; j++) {
-            cout << str[actions[i][j]]<<" ";
-        }
-        cout << endl;
-    }
-    */
     return 0;
 }

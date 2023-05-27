@@ -2,15 +2,15 @@
 #include <limits>
 #include <vector>
 #define ll long long 
-
-
+ 
+ 
 using namespace std;
-
-
+ 
+ 
 const uint64_t Mod =1e9 + 7;
 vector <int> coins;
 vector <ll> res; 
-
+ 
 ll solve(ll x){
     if (x < 0) return 0;
     if (x == 0) return 1;
@@ -24,12 +24,12 @@ ll solve(ll x){
     
     res[x] = count;
     return count;
-
+ 
 }
-
+ 
 int main (int argc, char *argv[]){
     
-
+ 
     int n,x,aux;
     cin >> n >> x;
     
